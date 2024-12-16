@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreteFácil - Calculadora de Fretes Mensais</title>
+    <style>
+        /* Define o estilo geral da página */
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0f2a, #2b3556);
+            color: #fff;
+            overflow-x: hidden; /* Evita rolagem horizontal */
+            transition: background 0.5s ease;
+        }
+
+        /* Modo claro */
+        body.light-mode {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        /* Estilo do cabeçalho fixo no topo */
+        header {
+            background-color: #0a0f2a;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header.light-mode {
+            background-color: #fff;
+        }
+
+        /* Animação de brilho no título */
+        header h1 {
+            font-size: 2.5rem;
+            color: #ff4c4c;
+            animation: glow 1.5s infinite alternate;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            margin-top: 10px;
+        }
+
+        /* Estilização do logotipo */
+        .logo {
+            width: 150px;
+            margin-bottom: 10px;
+        }
+
+        /* Definição da animação glow */
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #ff4c4c, 0 0 20px #ff4c4c;
+            }
+            to {
+                text-shadow: 0 0 20px #ff4c4c, 0 0 30px #ff4c4c;
+            }
+        }
+
+        /* Estilo do botão de modo claro/escuro */
+        .toggle-mode {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4c4c;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-mode:hover {
+            background: #d83a3a;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .container.light-mode {
+            background: #fff;
+            color: #333;
+        }
+
+        .container h2 {
+            color: #ff4c4c;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        label {
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* Estilo dos campos de entrada */
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 5px;
+            background: #2b3556;
+            color: #fff;
+        }
+
+        input.light-mode {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        /* Estilo do botão */
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            color: #fff;
+            background: #ff4c4c;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        /* Efeito ao passar o mouse sobre o botão */
+        button:hover {
+            background: #d83a3a;
+            transform: scale(1.05);
+        }
+
+        /* Efeito ao clicar no botão */
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Estilo do resultado */
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Adiciona transição suave ao resultado */
+        .result {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .result.visible {
+            opacity: 1;
+        }
+
+        /* Histórico de cálculos */
+        .history {
+            margin-top: 30px;
+        }
+
+        .history table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .history th, .history td {
+            border: 1px solid #444;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .history th {
+            background: #ff4c4c;
+            color: #fff;
+        }
+
+        .history td {
+            color: #ddd;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background: #0a0f2a;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: #ff4c4c;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="/mnt/data/minimalist logo for a freight calculator website in dark blue and red colors.png" alt="FreteFácil Logo" class="logo">
+        <h1>FreteFácil</h1>
+        <button class="toggle-mode" id="toggleMode">🌓</button>
+        <p>Simplifique o cálculo dos seus custos de frete mensais.</p>
+    </header>
+
+    <div class="container" id="container">
+        <h2>Calculadora de Fretes Mensais</h2>
+        <form id="freteForm">
+            <label for="freteUnico">Custo de um frete (R$):</label>
+            <input type="number" id="freteUnico" placeholder="Exemplo: 50" required>
+
+            <label for="qtdFretes">Quantidade de fretes no mês:</label>
+            <input type="number" id="qtdFretes" placeholder="Exemplo: 20" required>
+
+            <button type="submit">Calcular</button>
+        </form>
+        <div class="result" id="resultado"></div>
+
+        <div class="history" id="history">
+            <h3>Histórico de Cálculos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Custo de Frete (R$)</th>
+                        <th>Quantidade</th>
+                        <th>Total (R$)</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>Site criado por <a href="#">Guilherme Traspadini</a>.</p>
+    </footer>
+
+    <script>
+        // Alterna entre modo claro e escuro
+        const toggleModeButton = document.getElementById('toggleMode');
+        const body = document.body;
+        const container = document.getElementById('container');
+
+        toggleModeButton.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            container.classList.toggle('light-mode');
+        });
+
+        // Seleciona os elementos do formulário e o resultado
+        const freteForm = document.getElementById('freteForm');
+        const resultado = document.getElementById('resultado');
+        const historyTable = document.getElementById('historyTable');
+
+        // Adiciona um evento de envio ao formulário
+        freteForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Impede o comportamento padrão do formulário
+
+            // Obtém os valores dos campos de entrada
+            const freteUnico = parseFloat(document.getElementById('freteUnico').value);
+            const qtdFretes = parseInt(document.getElementById('qtdFretes').value);
+
+            // Verifica se os valores são válidos
+            if (isNaN(freteUnico) || isNaN(qtdFretes)) {
+                resultado.textContent = 'Por favor, insira valores válidos.';
+                resultado.classList.add('visible');
+                return;
+            }
+
+            // Calcula o custo total
+            const total = freteUnico * qtdFretes;
+
+            // Exibe o resultado
+            resultado.textContent = `Custo total mensal: R$ ${total.toFixed(2)}`;
+            resultado.classList.add('visible');
+
+            // Adiciona ao histórico
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>R$ ${freteUnico.toFixed(2)}</td>
+                <td>${qtdFretes}</td>
+                <td>R$ ${total.toFixed(2)}</td>
+            `;
+            historyTable.appendChild(newRow);
+
+            // Limpa os campos de entrada
+            freteForm.reset();
+        });
+    </script>
+</body>
+</html>
